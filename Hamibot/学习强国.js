@@ -365,7 +365,7 @@ className("android.view.ViewGroup").depth(15).findOnce(2).child(3).click();
 /*
  **********本地频道*********
  */
-if (!finish_list[12]) {
+if (!finish_list[10]) {
     // 去本地频道
     log("去本地频道");
     log("等待:" + "android.widget.LinearLayout");
@@ -465,15 +465,15 @@ if (!finish_list[2] && !finish_list[0]) {
 
     if (!textStartsWith("最近收听").exists() && !textStartsWith("推荐收听").exists()) {
         log("等待:" + "v_playing");
-        className("android.widget.ImageView").clickable(true).id("v_playing").waitFor();
+        // 不应该直接通过id寻找控件，因为此页面过多控件，寻找耗时太大
+        // className("android.widget.ImageView").clickable(true).id("v_playing").waitFor();
+        // 换成通过text寻找控件
+        textStartsWith("正在收听").waitFor();
         log("点击:" + "v_playing");
-        className("android.widget.ImageView").clickable(true).id("v_playing").findOne().click();
+        // className("android.widget.ImageView").clickable(true).id("v_playing").findOne().click();
+        textStartsWith("正在收听").findOne().parent().child(1).child(0).click();
     }
-    // 获取新的完成情况列表
     sleep(random_time(delay_time));
-    var back_track_flag = 2;
-    back_track();
-    var finish_list = get_finish_list();
 }
 
 back_track_flag = 1;
@@ -1039,13 +1039,21 @@ function do_periodic_answer(number) {
 function handling_access_exceptions() {
     if (text("访问异常").exists()) {
         // 滑动按钮位置
+        className('android.view.View').depth(10).clickable(true).waitFor();
         var pos = className('android.view.View').depth(10).clickable(true).findOnce(1).bounds();
         // 滑动框右边界
+        className('android.view.View').depth(9).clickable(false).waitFor();
         var right_border = className('android.view.View').depth(9).clickable(false).findOnce(0).bounds().right;
         // 位置取随机值
         var randomX = random(pos.left, pos.right);
         var randomY = random(pos.top, pos.bottom);
         swipe(randomX, randomY, randomX + right_border, randomY, random(200, 400));
+        if (textContains("刷新").exists()) {
+            click('刷新');
+        }
+    }
+    if (textContains("网络开小差").exists()) {
+        click('确定');
     }
 }
 
@@ -1543,33 +1551,8 @@ while (!finish_list[8] && whether_complete_subscription == "yes") {
 }
 
 /*
- **********分享与发表观点*********
+ **********发表观点*********
  */
-
-// 分享两次
-if (!finish_list[9]) {
-    sleep(random_time(delay_time));
-    if (!className("android.widget.TextView").depth(21).text("学习积分").exists()) back_track();
-    entry_model(11);
-    // 随意找一篇文章
-    sleep(random_time(delay_time));
-    my_click_clickable("推荐");
-    sleep(random_time(delay_time * 2));
-    log("点击:" + "android.widget.FrameLayout");
-    className("android.widget.FrameLayout").clickable(true).depth(22).findOnce(0).click();
-    sleep(random_time(delay_time * 2));
-    for (var i = 0; i < 2; i++) {
-        // 分享按键
-        log("分享" + i);
-        log("点击:" + "ImageView");
-        className("ImageView").depth(10).clickable(true).findOnce(2).click();
-        sleep(random_time(delay_time / 2));
-        my_click_clickable("分享到学习强国");
-        sleep(random_time(delay_time));
-        back();
-        sleep(random_time(delay_time));
-    }
-}
 
 if (!finish_list[9] && whether_complete_speech == "yes") {
     var speechs = ["好好学习，天天向上", "大国领袖，高瞻远瞩", "请党放心，强国有我", "坚持信念，砥砺奋进", "团结一致，共建美好", "为人民谋幸福"];
